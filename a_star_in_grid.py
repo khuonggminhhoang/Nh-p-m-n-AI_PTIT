@@ -39,7 +39,7 @@ def path(O: Node) -> None:
     return
 
 def aStar(src: Node, dest: Node, grid: list) -> None:
-    global openList, closedList
+    global openedList, closedList
 
     if not isValid(src.i, src.j) or not isValid(dest.i, dest.j):
         print('Source or destination is invalid!')
@@ -50,15 +50,15 @@ def aStar(src: Node, dest: Node, grid: list) -> None:
         return
 
     src.h = calcHeuristic(src, dest)
-    openList.put(src)
+    openedList.put(src)
 
     while True:
-        if openList.empty():
+        if openedList.empty():
             print('Not Found!')
             return
         
-        O: Node = openList.get()
-        closedList[O.i][O.j] = True         # đánh dấu điểm đã xét bằng true
+        O: Node = openedList.get()
+        closedList.put(O)               # đẩy Node vào close
 
         if O == dest:
             print('Found!')
@@ -69,23 +69,36 @@ def aStar(src: Node, dest: Node, grid: list) -> None:
         for index in range(4):
             x = O.i + vct[index][0]
             y = O.j + vct[index][1]
-            if isValid(x ,y) and not closedList[x][y] and isUnBlocked(x, y, grid):
+            if isValid(x ,y) and isUnBlocked(x, y, grid):
                 tmpNode = Node(x, y, O, O.g + 1)
                 tmpNode.h = calcHeuristic(tmpNode, dest)
                 
-                lst = openList.queue
-                if tmpNode in lst:
-                    for x in lst:
-                        if x == tmpNode and (tmpNode.g + tmpNode.h) < (x.g +  x.h):
-                            x.g = tmpNode.g
-                            x.h = tmpNode.h
-                            x.parent = tmpNode.parent 
-                            break
-                    openList = PriorityQueue()
-                    for x in lst:
-                        openList.put(x)
-                else:
-                    openList.put(tmpNode)
+                # kiểm tra Node tmp có nằm trong open hay không, nếu có thì cập nhật giá trị đường đi, nếu không kiểm tra tập close
+                lstOpen = openedList.queue
+                flag1 = False
+                for o in lstOpen:
+                    if o == tmpNode and (tmpNode.g + tmpNode.h) < (o.g +  o.h):
+                        o.g = tmpNode.g
+                        o.h = tmpNode.h
+                        o.parent = tmpNode.parent 
+                        flag1 = True
+                        break
+
+                if flag1:
+                    openedList = PriorityQueue()
+                    for o in lstOpen:
+                        openedList.put(o)
+
+                # kiểm tra tập close, nếu có tồn tại và Node trong close có f lớn hơn tmpNode thì put vào open
+                flag2 = False
+                lstColse = closedList.queue
+                for o in lstColse:
+                    if o == tmpNode and (tmpNode.g + tmpNode.h) < (o.g +  o.h):
+                        flag2 = True
+                        break
+
+                if not flag1 and not flag2:
+                    openedList.put(tmpNode)
 
 if __name__ == '__main__':
     grid = (
@@ -110,9 +123,6 @@ if __name__ == '__main__':
     src = Node(0, 0)
     dest = Node(8, 0)
 
-    openList = PriorityQueue()
-    closedList = [[False for _ in range(COL)] for _ in range(RAW)]
+    openedList = PriorityQueue()
+    closedList = PriorityQueue()
     aStar(src, dest, grid)
-
-    for x in closedList:
-        print(*x)
