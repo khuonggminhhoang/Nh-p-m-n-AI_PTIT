@@ -94,6 +94,7 @@ def aStar(src: Node, dest: Node, grid: list) -> None:
                 lstColse = closedList.queue
                 for o in lstColse:
                     if o == tmpNode and (tmpNode.g + tmpNode.h) < (o.g +  o.h):
+                        openedList.put(tmpNode)
                         flag2 = True
                         break
 
