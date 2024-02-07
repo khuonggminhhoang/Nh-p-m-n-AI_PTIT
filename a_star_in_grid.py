@@ -97,7 +97,8 @@ def aStar(src: Node, dest: Node, grid: list) -> None:
                         openedList.put(tmpNode)
                         flag2 = True
                         break
-
+                
+                # nếu không nằm trong open và close thì đẩy vào open
                 if not flag1 and not flag2:
                     openedList.put(tmpNode)
 

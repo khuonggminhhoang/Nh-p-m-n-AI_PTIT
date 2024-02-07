@@ -12,6 +12,9 @@ class Node:
     
     def __eq__(self, other) -> bool:
         return self.name == other.name
+
+    def __str__(self) -> str:
+        return f'{self.name} <- {self.parent}'
     
 def path(O: Node) -> None:
     print(O.name, end=' ')
@@ -20,8 +23,8 @@ def path(O: Node) -> None:
     return
 
 def Astar(S: Node, T: Node) -> None:
-    global Open, Close, data
-    S.h = data[S.name][-1]      # set giá trị h cho Node S
+    global Open, Close, graph
+    S.h = graph[S.name][-1]      # set giá trị h cho Node S
 
     Open.put(S)
     while True: 
@@ -34,12 +37,13 @@ def Astar(S: Node, T: Node) -> None:
 
         if O == T:
             print('Found!')
-            path(O)
-            print('\nmin distance:', O.g)
+            print(O)
+            # path(O)
+            print('min distance:', O.g)
             return
 
-        for name, weight in data[O.name][:-1]:
-            h = data[O.name][-1]
+        for name, weight in graph[O.name][:-1]:
+            h = graph[O.name][-1]
             tmp = Node(name, O, O.g + weight, h)        # tmp là Node kề với Node O
 
             lst = Open.queue
@@ -58,15 +62,29 @@ def Astar(S: Node, T: Node) -> None:
                 
 
 if __name__ == '__main__':
-    data  = {
-        'S' : [('A', 2), ('B', 3), 6],
-        'A' : [('D', 3), 4],
-        'B' : [('C', 3), ('D', 1), 4],
-        'C' : [('E', 2), 3],
-        'D' : [('C', 1), ('F', 3), 4],
-        'E' : [('G', 1), 1],
-        'F' : [('G', 2), 1], 
-        'G' : [0]
+    # graph  = {
+    #     'S' : [('A', 2), ('B', 3), 6],
+    #     'A' : [('D', 3), 4],
+    #     'B' : [('C', 3), ('D', 1), 4],
+    #     'C' : [('E', 2), 3],
+    #     'D' : [('C', 1), ('F', 3), 4],
+    #     'E' : [('G', 1), 1],
+    #     'F' : [('G', 2), 1], 
+    #     'G' : [0]
+    # }
+
+    graph  = {
+        'S' : [('A', 55), ('B', 42), ('C', 48), ('E', 72), 125],
+        'A' : [('D', 45), 123],
+        'B' : [('F', 40), 82],
+        'C' : [('B', 40),('F', 68), 118],
+        'D' : [('E', 45), 115],
+        'E' : [('G', 82), 72],
+        'F' : [('G', 55), 40], 
+        'G' : [0],
+        'H' : [('I', 50), 70],
+        'I' : [('G', 47), 40],
+        'K' : [('G', 38), 30]
     }
 
     Open = PriorityQueue()
